@@ -2,6 +2,24 @@
 
 Panduan menangani percakapan bantuan dari pengguna AMDALNET.
 
+<nav class="guide-cards" aria-label="Navigasi panduan">
+  <a class="guide-card" href="#/?id=_1-daftar-chat">
+    <span class="guide-card-icon" aria-hidden="true">☷</span>
+    <span><strong>Daftar Chat</strong><small>Lihat, cari, dan filter chat masuk</small></span>
+    <span class="guide-card-arrow" aria-hidden="true">→</span>
+  </a>
+  <a class="guide-card" href="#/?id=_3-membalas-chat">
+    <span class="guide-card-icon" aria-hidden="true">☏</span>
+    <span><strong>Balas & kelola chat</strong><small>Kirim pesan, lampiran, dan akhiri chat</small></span>
+    <span class="guide-card-arrow" aria-hidden="true">→</span>
+  </a>
+  <a class="guide-card" href="#/?id=_5-pengaturan-chat">
+    <span class="guide-card-icon" aria-hidden="true">⚙</span>
+    <span><strong>Pengaturan</strong><small>Template, agen, SMTP, dan jadwal layanan</small></span>
+    <span class="guide-card-arrow" aria-hidden="true">→</span>
+  </a>
+</nav>
+
 ## Siapa yang dapat menggunakan
 
 | Fitur | Admin / Admin-child | Helpdesk (Agen) |

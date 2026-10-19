@@ -7,22 +7,408 @@
   <meta name="description" content="Panduan Chat Bantuan AMDALNET untuk Admin dan Helpdesk">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4.13.1/lib/themes/vue.css">
   <style>
-    :root { --theme-color: #3AB06F; }
+    :root {
+      --theme-color: #16834a;
+      --ink: #18332a;
+      --muted: #64756d;
+      --line: #e1eae5;
+      --soft: #f3f8f5;
+      --header-height: 68px;
+      --sidebar-width: 258px;
+    }
+    * { box-sizing: border-box; }
+    body { color: var(--ink); background: #fff; }
+    .topbar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      min-height: var(--header-height);
+      padding: 10px 24px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, .96);
+      box-shadow: 0 4px 18px rgba(20, 50, 36, .04);
+      backdrop-filter: blur(12px);
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      flex: 0 0 auto;
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 750;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .brand-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border-radius: 12px;
+      color: #fff;
+      background: linear-gradient(145deg, #24a361, #117544);
+      font-size: 20px;
+    }
+    .menu-toggle { display: grid; width: 38px; height: 38px; flex: 0 0 auto; place-items: center; border: 1px solid var(--line); border-radius: 10px; color: #405b4c; background: #fff; cursor: pointer; font-size: 19px; }
+    .menu-toggle:hover { color: var(--theme-color); background: var(--soft); }
+    .header-search { position: relative; flex: 0 1 340px; margin-left: auto; }
+    .header-search label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+    .header-search input {
+      width: 100%;
+      height: 42px;
+      padding: 0 42px 0 39px;
+      border: 1px solid #dce7e0;
+      border-radius: 12px;
+      outline: 0;
+      color: var(--ink);
+      background: #f7faf8;
+      font: inherit;
+      font-size: 13px;
+      transition: border-color .18s, box-shadow .18s, background .18s;
+    }
+    .header-search input:focus { border-color: #74bd91; background: #fff; box-shadow: 0 0 0 4px rgba(22, 131, 74, .1); }
+    .search-icon { position: absolute; top: 11px; left: 13px; color: #77877e; pointer-events: none; }
+    .search-shortcut { position: absolute; top: 11px; right: 12px; color: #84928b; font-size: 11px; pointer-events: none; }
+    .search-results {
+      position: absolute;
+      top: calc(100% + 9px);
+      right: 0;
+      left: 0;
+      display: none;
+      max-height: min(65vh, 440px);
+      overflow: auto;
+      padding: 6px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 16px 38px rgba(21, 49, 35, .15);
+    }
+    .search-results.is-open { display: block; }
+    .search-result { display: block; padding: 11px 12px; border-radius: 9px; color: inherit; text-decoration: none; }
+    .search-result:hover, .search-result:focus-visible { outline: 0; background: var(--soft); }
+    .search-result strong { display: block; color: var(--ink); font-size: 13px; }
+    .search-result small { display: -webkit-box; overflow: hidden; margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.45; line-clamp: 2; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+    .search-empty { padding: 13px 12px; color: var(--muted); font-size: 13px; }
+    #app { min-height: calc(100vh - var(--header-height)); }
+    #guide-sidebar { position: fixed; top: var(--header-height); bottom: 0; left: 0; z-index: 40; width: var(--sidebar-width); overflow-y: auto; padding: 25px 16px 30px; border-right: 1px solid var(--line); background: #fbfdfb; transition: transform .22s ease; }
+    .sidebar-caption { margin: 0 10px 14px; color: #8a9890; font-size: 10px; font-weight: 750; letter-spacing: .12em; }
+    .sidebar-group { margin: 0 0 20px; }
+    .sidebar-link { display: flex; align-items: center; gap: 11px; min-height: 40px; padding: 9px 11px; border-radius: 9px; color: #52665a; font-size: 13px; font-weight: 560; line-height: 1.35; text-decoration: none; transition: color .15s, background .15s; }
+    .sidebar-link:hover, .sidebar-link:focus-visible { outline: 0; color: #147444; background: #edf6f0; }
+    .sidebar-link.active { color: #116b3e; background: #e8f4ec; font-weight: 700; }
+    .sidebar-link .nav-icon { display: grid; width: 20px; flex: 0 0 20px; place-items: center; color: #839289; font-size: 15px; }
+    .sidebar-link.active .nav-icon { color: #16834a; }
+    .sidebar-subnav { margin: 2px 0 4px 20px; padding-left: 10px; border-left: 1px solid #dce8df; }
+    .sidebar-subnav .sidebar-link { min-height: 34px; padding: 7px 10px; font-size: 12px; }
+    .guide-sidebar-nav { display: block; }
+    .guide-sidebar-footer { margin: 28px 8px 0; padding: 14px; border: 1px solid var(--line); border-radius: 12px; color: var(--muted); background: #fff; font-size: 11px; line-height: 1.6; }
+    .guide-sidebar-footer strong { display: block; margin-bottom: 3px; color: #355441; font-size: 12px; }
+    .sidebar-backdrop { display: none; }
+    .sidebar, .sidebar-toggle { display: none !important; }
+    .content { top: var(--header-height) !important; left: var(--sidebar-width) !important; right: 0 !important; padding-top: 0 !important; transition: left .22s ease; }
+    .markdown-section { max-width: 960px; padding: 45px 38px 88px; }
+    body.sidebar-collapsed #guide-sidebar { transform: translateX(-100%); }
+    body.sidebar-collapsed .content { left: 0 !important; }
+    .markdown-section h1 { margin: 0 0 12px; color: #173b2b; font-size: clamp(30px, 4vw, 42px); font-weight: 780; letter-spacing: -.045em; }
+    .markdown-section h2 { margin-top: 54px; padding-bottom: 12px; border-bottom: 1px solid var(--line); color: #204735; font-size: 25px; letter-spacing: -.025em; scroll-margin-top: calc(var(--header-height) + 18px); }
+    .markdown-section h3 { margin-top: 30px; color: #28543e; scroll-margin-top: calc(var(--header-height) + 18px); }
+    .markdown-section p, .markdown-section li { color: #344b40; line-height: 1.75; }
+    .markdown-section a { color: #137746; }
+    .markdown-section table { display: table; width: 100%; margin: 20px 0 28px; border: 1px solid var(--line); border-radius: 12px; border-spacing: 0; overflow: hidden; font-size: 14px; }
+    .markdown-section th { color: #274737; background: #f1f7f3; font-weight: 700; }
+    .markdown-section th, .markdown-section td { padding: 12px 14px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .markdown-section tr:last-child td { border-bottom: 0; }
+    .markdown-section td:last-child, .markdown-section th:last-child { border-right: 0; }
+    .markdown-section blockquote { margin: 22px 0; padding: 14px 18px; border-left: 4px solid #42a76d; border-radius: 0 10px 10px 0; background: #f3f8f5; }
+    .guide-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; margin: 30px 0 43px; }
+    .guide-card { display: flex; align-items: center; gap: 12px; min-height: 88px; padding: 16px; border: 1px solid var(--line); border-radius: 14px; color: inherit !important; background: #fff; text-decoration: none !important; transition: transform .18s, border-color .18s, box-shadow .18s; }
+    .guide-card:hover, .guide-card:focus-visible { transform: translateY(-2px); border-color: #9bc9aa; outline: 0; box-shadow: 0 10px 24px rgba(24, 66, 43, .08); }
+    .guide-card-icon { display: grid; width: 40px; height: 40px; flex: 0 0 auto; place-items: center; border-radius: 12px; color: #16834a; background: #eaf5ee; font-size: 19px; }
+    .guide-card strong, .guide-card small { display: block; }
+    .guide-card strong { color: var(--ink); font-size: 13px; }
+    .guide-card small { margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .guide-card-arrow { margin-left: auto; color: #16834a; font-size: 17px; }
+    @media (max-width: 900px) {
+      :root { --sidebar-width: 235px; }
+      .topbar { gap: 14px; padding: 10px 18px; }
+      .brand { font-size: 14px; }
+      .brand-mark { width: 35px; height: 35px; }
+      .header-search { flex-basis: 290px; }
+      .markdown-section { padding: 36px 30px 70px; }
+    }
+    @media (max-width: 620px) {
+      :root { --header-height: 62px; --sidebar-width: 280px; }
+      .topbar { gap: 10px; padding: 8px 12px; }
+      .brand { font-size: 14px; }
+      .brand-mark { width: 34px; height: 34px; }
+      .brand span:last-child span { display: none; }
+      .menu-toggle { width: 36px; height: 36px; }
+      .header-search { flex: 1 1 auto; min-width: 0; }
+      .header-search input { height: 38px; padding-left: 34px; }
+      .search-icon { top: 9px; left: 11px; }
+      .search-shortcut { display: none; }
+      #guide-sidebar { top: var(--header-height); transform: translateX(-100%); box-shadow: 16px 0 36px rgba(18, 45, 29, .1); }
+      body.sidebar-collapsed #guide-sidebar { transform: translateX(-100%); }
+      body.sidebar-open #guide-sidebar { transform: translateX(0); }
+      .content, body.sidebar-collapsed .content { left: 0 !important; }
+      .sidebar-backdrop { position: fixed; inset: var(--header-height) 0 0; z-index: 35; background: rgba(16, 34, 24, .35); }
+      body.sidebar-open .sidebar-backdrop { display: block; }
+      .markdown-section { padding: 32px 20px 60px; }
+      .guide-cards { grid-template-columns: 1fr; gap: 9px; margin: 23px 0 34px; }
+      .guide-card { min-height: 76px; }
+      .markdown-section table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
   </style>
 </head>
 <body>
+  <header class="topbar">
+    <button class="menu-toggle" type="button" aria-label="Tampilkan navigasi" aria-expanded="true" aria-controls="guide-sidebar">☰</button>
+    <a class="brand" href="#/" aria-label="Chat Bantuan AMDALNET, beranda">
+      <span class="brand-mark" aria-hidden="true">✦</span>
+      <span>Chat Bantuan <span style="color:#7b8c82;font-weight:500">/ AMDALNET</span></span>
+    </a>
+    <div class="header-search">
+      <label for="guide-search">Cari di panduan</label>
+      <span class="search-icon" aria-hidden="true">⌕</span>
+      <input id="guide-search" type="search" placeholder="Cari di panduan..." autocomplete="off" aria-controls="guide-search-results" aria-expanded="false">
+      <span class="search-shortcut" aria-hidden="true">/</span>
+      <div id="guide-search-results" class="search-results" role="listbox" aria-label="Hasil pencarian"></div>
+    </div>
+  </header>
+  <aside id="guide-sidebar" aria-label="Navigasi panduan">
+    <p class="sidebar-caption">PUSAT BANTUAN</p>
+    <div class="guide-sidebar-nav" role="navigation" aria-label="Bagian panduan">
+      <div class="sidebar-group">
+        <a class="sidebar-link" href="#/?id=siapa-yang-dapat-menggunakan" data-section-id="siapa-yang-dapat-menggunakan"><span class="nav-icon">⌂</span>Ikhtisar</a>
+      </div>
+      <div class="sidebar-group">
+        <p class="sidebar-caption">PENGELOLAAN CHAT</p>
+        <a class="sidebar-link" href="#/?id=_1-daftar-chat" data-section-id="_1-daftar-chat"><span class="nav-icon">☷</span>Daftar Chat</a>
+        <div class="sidebar-subnav">
+          <a class="sidebar-link" href="#/?id=kolom-tabel" data-section-id="kolom-tabel">Kolom tabel</a>
+          <a class="sidebar-link" href="#/?id=filter" data-section-id="filter">Filter chat</a>
+        </div>
+        <a class="sidebar-link" href="#/?id=_2-menugaskan-chat-ke-agen-khusus-admin" data-section-id="_2-menugaskan-chat-ke-agen-khusus-admin"><span class="nav-icon">♙</span>Penugasan agen</a>
+        <a class="sidebar-link" href="#/?id=_3-membalas-chat" data-section-id="_3-membalas-chat"><span class="nav-icon">☏</span>Membalas Chat</a>
+        <div class="sidebar-subnav">
+          <a class="sidebar-link" href="#/?id=mengirim-pesan" data-section-id="mengirim-pesan">Mengirim pesan</a>
+          <a class="sidebar-link" href="#/?id=lampiran" data-section-id="lampiran">Lampiran</a>
+          <a class="sidebar-link" href="#/?id=template-balasan" data-section-id="template-balasan">Template balasan</a>
+        </div>
+        <a class="sidebar-link" href="#/?id=_4-mengakhiri-chat" data-section-id="_4-mengakhiri-chat"><span class="nav-icon">✓</span>Mengakhiri Chat</a>
+      </div>
+      <div class="sidebar-group">
+        <p class="sidebar-caption">KONFIGURASI</p>
+        <a class="sidebar-link" href="#/?id=_5-pengaturan-chat" data-section-id="_5-pengaturan-chat"><span class="nav-icon">⚙</span>Pengaturan Chat</a>
+        <div class="sidebar-subnav">
+          <a class="sidebar-link" href="#/?id=_51-template-chat" data-section-id="_51-template-chat">Template Chat</a>
+          <a class="sidebar-link" href="#/?id=_52-smtp" data-section-id="_52-smtp">SMTP</a>
+          <a class="sidebar-link" href="#/?id=_53-agen-chat" data-section-id="_53-agen-chat">Agen Chat</a>
+          <a class="sidebar-link" href="#/?id=_54-jam-operasional" data-section-id="_54-jam-operasional">Jam Operasional</a>
+          <a class="sidebar-link" href="#/?id=_55-hari-libur" data-section-id="_55-hari-libur">Hari Libur</a>
+        </div>
+      </div>
+      <div class="sidebar-group">
+        <a class="sidebar-link" href="#/?id=faq" data-section-id="faq"><span class="nav-icon">?</span>FAQ</a>
+      </div>
+    </div>
+    <div class="guide-sidebar-footer"><strong>Chat Bantuan AMDALNET</strong>Panduan untuk Admin dan Helpdesk.</div>
+  </aside>
+  <div class="sidebar-backdrop" aria-hidden="true"></div>
   <div id="app">Memuat dokumentasi...</div>
   <script>
     window.$docsify = {
       name: 'Chat Bantuan AMDALNET',
-      homepage:'home.md',
+      homepage: 'home.md',
       loadSidebar: false,
       subMaxLevel: 3,
       auto2top: true,
-      search: { placeholder: 'Cari...', noData: 'Tidak ditemukan', depth: 3 },
+      search: false,
     };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/docsify@4.13.1/lib/docsify.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docsify@4.13.1/lib/plugins/search.min.js"></script>
+  <script>
+    (() => {
+      const input = document.getElementById('guide-search');
+      const results = document.getElementById('guide-search-results');
+      const menuToggle = document.querySelector('.menu-toggle');
+      const sidebar = document.getElementById('guide-sidebar');
+      let sections = [];
+      let headings = [];
+      let headingObserver;
+
+      const updateActiveLink = (id) => {
+        document.querySelectorAll('.sidebar-link').forEach((link) => {
+          const active = link.dataset.sectionId === id;
+          link.classList.toggle('active', active);
+          if (active) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      };
+
+      const closeSidebar = () => {
+        document.body.classList.remove('sidebar-open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+      };
+
+      const navigateToSection = (id) => {
+        if (!document.getElementById(id)) return;
+        const destination = `#/?id=${id}`;
+        if (window.location.hash !== destination) window.location.hash = destination;
+        window.setTimeout(() => {
+          const currentTarget = document.getElementById(id);
+          if (!currentTarget) return;
+          const top = currentTarget.getBoundingClientRect().top + window.scrollY;
+          const headerOffset = document.querySelector('.topbar').getBoundingClientRect().height + 12;
+          window.scrollTo(0, Math.max(0, top - headerOffset));
+        }, 300);
+      };
+
+      const syncActiveLinkToScroll = () => {
+        const visibleHeadings = [...document.querySelectorAll('.markdown-section h2, .markdown-section h3')];
+        if (!visibleHeadings.length) return;
+        const threshold = document.querySelector('.topbar').getBoundingClientRect().bottom + 24;
+        let current = visibleHeadings[0];
+        for (const heading of visibleHeadings) {
+          if (heading.getBoundingClientRect().top <= threshold) current = heading;
+          else break;
+        }
+        let activeHeading = current;
+        while (activeHeading && !sidebar.querySelector(`[data-section-id="${activeHeading.id}"]`)) {
+          const currentIndex = visibleHeadings.indexOf(activeHeading);
+          activeHeading = currentIndex > 0 ? visibleHeadings[currentIndex - 1] : null;
+        }
+        if (activeHeading) updateActiveLink(activeHeading.id);
+      };
+
+      menuToggle.addEventListener('click', () => {
+        if (window.matchMedia('(max-width: 620px)').matches) {
+          const isOpen = document.body.classList.toggle('sidebar-open');
+          menuToggle.setAttribute('aria-expanded', String(isOpen));
+        } else {
+          const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+          menuToggle.setAttribute('aria-expanded', String(!isCollapsed));
+        }
+      });
+      document.querySelector('.sidebar-backdrop').addEventListener('click', closeSidebar);
+      sidebar.addEventListener('click', (event) => {
+        const link = event.target.closest('.sidebar-link');
+        if (!link) return;
+        event.preventDefault();
+        const id = link.dataset.sectionId;
+        if (!document.getElementById(id)) return;
+        updateActiveLink(id);
+        navigateToSection(id);
+        if (window.matchMedia('(max-width: 620px)').matches) closeSidebar();
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeSidebar();
+      });
+
+      const refreshSections = () => {
+        const root = document.querySelector('.markdown-section');
+        if (!root) return;
+        headings = [...root.querySelectorAll('h2, h3')];
+        headingObserver?.disconnect();
+        const headerOffset = Math.round(document.querySelector('.topbar').getBoundingClientRect().bottom + 24);
+        headingObserver = new IntersectionObserver((entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) syncActiveLinkToScroll();
+        }, { rootMargin: `-${headerOffset}px 0px -70% 0px` });
+        headings.forEach((heading) => headingObserver.observe(heading));
+        sections = headings.map((heading) => {
+          let text = heading.textContent.trim();
+          let node = heading.nextElementSibling;
+          while (node && !/^H[1-3]$/.test(node.tagName)) {
+            text += ` ${node.textContent}`;
+            node = node.nextElementSibling;
+          }
+          return { title: heading.textContent.trim(), id: heading.id, text: text.replace(/\s+/g, ' ').trim() };
+        }).filter((section) => section.id);
+      };
+
+      const closeResults = () => {
+        results.classList.remove('is-open');
+        input.setAttribute('aria-expanded', 'false');
+      };
+
+      const renderResults = () => {
+        refreshSections();
+        const query = input.value.trim().toLocaleLowerCase('id');
+        results.replaceChildren();
+        if (!query) return closeResults();
+        const terms = query.split(/\s+/).filter(Boolean);
+        const matches = sections.filter((section) => terms.every((term) => section.text.toLocaleLowerCase('id').includes(term))).slice(0, 7);
+        if (!matches.length) {
+          const empty = document.createElement('div');
+          empty.className = 'search-empty';
+          empty.textContent = 'Tidak ada hasil. Coba kata kunci lain.';
+          results.append(empty);
+        } else {
+          matches.forEach((section) => {
+            const link = document.createElement('a');
+            link.className = 'search-result';
+            link.href = `#/?id=${section.id}`;
+            link.setAttribute('role', 'option');
+            const title = document.createElement('strong');
+            title.textContent = section.title;
+            const excerpt = document.createElement('small');
+            excerpt.textContent = section.text.slice(0, 155);
+            link.append(title, excerpt);
+            link.addEventListener('click', (event) => {
+              event.preventDefault();
+              input.value = '';
+              closeResults();
+              navigateToSection(section.id);
+              updateActiveLink(section.id);
+            });
+            results.append(link);
+          });
+        }
+        results.classList.add('is-open');
+        input.setAttribute('aria-expanded', 'true');
+      };
+
+      input.addEventListener('input', renderResults);
+      input.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeResults();
+        if (event.key === 'Enter') {
+          const first = results.querySelector('.search-result');
+          if (first && results.classList.contains('is-open')) first.click();
+        }
+      });
+      document.addEventListener('click', (event) => {
+        if (!event.target.closest('.header-search')) closeResults();
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+          event.preventDefault();
+          input.focus();
+        }
+      });
+      new MutationObserver(refreshSections).observe(document.getElementById('app'), { childList: true, subtree: true });
+      window.addEventListener('hashchange', () => window.setTimeout(refreshSections, 0));
+      window.addEventListener('hashchange', () => {
+        const id = new URLSearchParams(window.location.hash.split('?')[1] || '').get('id');
+        if (id) updateActiveLink(id);
+      });
+      let lastObservedScroll = window.scrollY;
+      window.addEventListener('scroll', syncActiveLinkToScroll, { passive: true });
+      window.setInterval(() => {
+        if (window.scrollY === lastObservedScroll) return;
+        lastObservedScroll = window.scrollY;
+        syncActiveLinkToScroll();
+      }, 160);
+      const initialId = new URLSearchParams(window.location.hash.split('?')[1] || '').get('id');
+      updateActiveLink(initialId || 'siapa-yang-dapat-menggunakan');
+      refreshSections();
+      window.setTimeout(syncActiveLinkToScroll, 100);
+    })();
+  </script>
 </body>
 </html>
